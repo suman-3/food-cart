@@ -1,9 +1,13 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const BusinessItem = ({ business }) => {
   return (
-    <div className="p-3 rounded-xl cursor-pointer bg-slate-100 border border-gray-300 group">
+    <Link
+      href={"/restaurant/" + business?.slug}
+      className="p-3 rounded-xl cursor-pointer bg-slate-100 border border-gray-300 group"
+    >
       <img
         src={business?.banner?.url}
         alt={business?.name}
@@ -21,12 +25,15 @@ const BusinessItem = ({ business }) => {
               </h2>
             </div>
           </div>
-          <h2 className="text-sm text-gray-700 underline ">
+          <Link
+            href={"?category=" + business?.categories[0].slug}
+            className="text-sm text-gray-700 underline "
+          >
             {business?.categories[0].name}
-          </h2>
+          </Link>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
