@@ -24,12 +24,14 @@ const BusinessList = () => {
     });
   };
 
+
+
   return (
     <div className="mt-5">
       {businessList.length > 0 ? (
         <>
           <h2 className="capitalize font-bold text-2xl">
-            Popular {category} Resturants
+            Popular {category} Restaurants
           </h2>
           <h2 className="font-bold text-primary mt-1">
             {businessList?.length} Results
