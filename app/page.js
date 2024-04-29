@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
+import CategoryList from "./_components/CategoryList";
+import BusinessList from "./_components/BusinessList";
 
 export default function Home() {
   return (
     <div>
-      <h2>Hello World</h2>
-      <Button>
-        <SignInButton/>
-      </Button>
+      <CategoryList />
+      <BusinessList />
     </div>
   );
 }

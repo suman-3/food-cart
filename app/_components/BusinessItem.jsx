@@ -1,0 +1,33 @@
+import Image from "next/image";
+import React from "react";
+
+const BusinessItem = ({ business }) => {
+  return (
+    <div className="p-3 rounded-xl cursor-pointer bg-slate-100 border border-gray-300 group">
+      <img
+        src={business?.banner?.url}
+        alt={business?.name}
+        className="w-full h-[150px] rounded-md object-cover"
+      />
+      <div className="mt-1">
+        <h2 className="font-bold text-lg">{business?.name}</h2>
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <Image src="/star.png" alt="star" width={14} height={14} />
+            <label className="text-gray-400 text-sm">4.5</label>
+            <div className="flex gap-1 items-center">
+              <h2 className="text-gray-400 text-sm">
+                {business?.restroType[0]}
+              </h2>
+            </div>
+          </div>
+          <h2 className="text-sm text-gray-700 underline ">
+            {business?.categories[0].name}
+          </h2>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BusinessItem;
