@@ -21,10 +21,10 @@ const Header = () => {
   const [cart, setCart] = useState([]);
 
   useEffect(() => {
-    if (isSignedIn && user) {
-      GetUserCart(user.primaryEmailAddress.emailAddress);
+    if (user) {
+      GetUserCart(user?.primaryEmailAddress.emailAddress);
     }
-  }, [isSignedIn, user, updateCart]);
+  }, [user, updateCart]);
 
   const GetUserCart = () => {
     GlobalApi.GetUserCart(user?.primaryEmailAddress?.emailAddress).then(
