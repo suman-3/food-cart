@@ -6,7 +6,7 @@ const BusinessItem = ({ business }) => {
   return (
     <Link
       href={"/restaurant/" + business?.slug}
-      className="p-3 rounded-xl cursor-pointer bg-slate-100 border border-gray-300 group"
+      className="p-3 rounded-xl cursor-pointer group"
     >
       <img
         src={business?.banner?.url}
