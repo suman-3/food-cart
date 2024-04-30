@@ -5,9 +5,13 @@ import { SquarePlus } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import MenuItemSkeleton from "./MenuItemSkeleton";
+import { useUser } from "@clerk/nextjs";
+import GlobalApi from "@/app/_utils/GlobalApi";
+import { toast } from "sonner";
 
 const MenuSection = ({ restaurant }) => {
   const [menuItemList, setMenuItemList] = useState([]); // used to store the menu items of the restaurant
+  const { user } = useUser();
 
   useEffect(() => {
     restaurant?.menu && FilterMenu(restaurant?.menu[0]?.category);
@@ -19,6 +23,27 @@ const MenuSection = ({ restaurant }) => {
     );
     setMenuItemList(result[0]);
   };
+
+  const addToCartHandler = (item) => {
+    toast("Adding to cart");
+    const data = {
+      email: user?.primaryEmailAddress?.emailAddress,
+      name: item?.name,
+      description: item?.description,
+      productImage: item?.productImage?.url,
+      price: item?.price,
+    };
+    GlobalApi.AddToCart(data).then(
+      (resp) => {
+        console.log(resp);
+        toast("Added to cart");
+      },
+      (error) => {
+        toast("Failed to add to cart");
+      }
+    );
+  };
+
   return (
     <div>
       <div className="grid grid-cols-4 mt-2 pl-1">
@@ -37,7 +62,7 @@ const MenuSection = ({ restaurant }) => {
           </div>
         ) : (
           <div className="flex flex-col gap-4 mt-6">
-            <div className="w-[200px] h-[30px] bg-slate-200 rounded-md animate-pulse"  />
+            <div className="w-[200px] h-[30px] bg-slate-200 rounded-md animate-pulse" />
             <div className="w-[200px] h-[30px] bg-slate-200 rounded-md animate-pulse" />
           </div>
         )}
@@ -47,7 +72,7 @@ const MenuSection = ({ restaurant }) => {
           {menuItemList?.menuItem ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
               {menuItemList?.menuItem?.map((item, index) => (
-                <div className="p-2 flex gap-3 items-center border rounded-xl hover:border-primary transition-all cursor-pointer hover:bg-orange-50 duration-200">
+                <div className="p-2 flex gap-3 items-center border rounded-xl hover:border-primary transition-all hover:bg-orange-50 duration-200">
                   <Image
                     src={item?.productImage?.url}
                     alt={item?.name}
@@ -61,7 +86,10 @@ const MenuSection = ({ restaurant }) => {
                     <h2 className="text-sm text-gray-400 line-clamp-2">
                       {item?.description}
                     </h2>
-                    <SquarePlus className="mt-1" />
+                    <SquarePlus
+                      className="mt-1 cursor-pointer"
+                      onClick={() => addToCartHandler(item)}
+                    />
                   </div>
                 </div>
               ))}
