@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
-import { Search } from "lucide-react";
+import { Search, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
@@ -20,7 +20,13 @@ const Header = () => {
         <Search className="opacity-60" />
       </div>
       {isSignedIn ? (
-        <div className="flex items-center">
+        <div className="flex items-center gap-5">
+          <div className="flex items-center gap-1">
+            <ShoppingCart />
+            <label className="mt-[1.7px] px-[10px] py-[1.7px] rounded-full bg-slate-200 flex items-center justify-center">
+              0
+            </label>
+          </div>
           <UserButton />
         </div>
       ) : (

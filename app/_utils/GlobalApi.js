@@ -97,4 +97,27 @@ const GetBusinessDetail = async (businessSlug) => {
   return result;
 };
 
-export default { GetCategory, GetBusiness, GetBusinessDetail };
+const AddToCart = async (data) => {
+  const query = gql`
+    mutation AddToCart {
+      createUserCart(
+        data: {
+          email: "`+data?.email+`"
+          productDescription: "`+data?.description+`"
+          productImage:"`+data?.productImage+`"
+          productName: "`+data?.name+`"
+          price: `+data?.price+`
+        }
+      ) {
+        id
+      }
+      publishManyUserCarts(to: PUBLISHED) {
+        count
+      }
+    }
+  `;
+  const result = await request(MASTER_URL, query);
+  return result;
+};
+
+export default { GetCategory, GetBusiness, GetBusinessDetail, AddToCart };

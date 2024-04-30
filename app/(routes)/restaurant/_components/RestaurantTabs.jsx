@@ -12,7 +12,7 @@ const RestaurantTabs = ({ restaurant }) => {
       </TabsList>
 
       <TabsContent value="category">
-        <MenuSection restaurant={restaurant} />
+        <MenuSection restaurant={restaurant} key={restaurant?.name} />
       </TabsContent>
       <TabsContent value="about">about</TabsContent>
       <TabsContent value="review">review</TabsContent>
