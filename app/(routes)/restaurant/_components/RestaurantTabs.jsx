@@ -1,6 +1,8 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import MenuSection from "./MenuSection";
+import ReviewSection from "./ReviewSection";
+import AboutDetails from "./AboutDetails";
 
 const RestaurantTabs = ({ restaurant }) => {
   return (
@@ -14,8 +16,12 @@ const RestaurantTabs = ({ restaurant }) => {
       <TabsContent value="category">
         <MenuSection restaurant={restaurant} key={restaurant?.name} />
       </TabsContent>
-      <TabsContent value="about">about</TabsContent>
-      <TabsContent value="review">review</TabsContent>
+      <TabsContent value="about">
+        <AboutDetails restaurant={restaurant} />
+      </TabsContent>
+      <TabsContent value="review">
+        <ReviewSection restaurant={restaurant} />
+      </TabsContent>
     </Tabs>
   );
 };
