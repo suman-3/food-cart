@@ -23,9 +23,12 @@ const GetCategory = async () => {
 };
 
 const GetBusiness = async (category) => {
-  const query = gql`
+  const query =
+    gql`
     query GetBusiness {
-      resturants(where: { categories_some: { slug: "all" } }) {
+      resturants(where: { categories_some: { slug: "` +
+    category +
+    `" } }) {
         aboutUs
         address
         banner {
