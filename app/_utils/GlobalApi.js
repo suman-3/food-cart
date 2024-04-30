@@ -148,10 +148,52 @@ const GetUserCart = async (userEmail) => {
   const result = await request(MASTER_URL, query);
   return result;
 };
+
+const DisconnectRestroFromUserCartItem = async (id) => {
+  const query =
+    gql`
+    mutation DiconnectRestroFromUserCartItem {
+      updateUserCart(
+        data: { resturant: { disconnect: true } }
+        where: { id: "` +
+    id +
+    `" }
+      )
+      {
+        id
+      }
+      publishManyUserCarts(to: PUBLISHED) {
+        count
+      }
+    }
+  `;
+  const result = await request(MASTER_URL, query);
+  return result;
+};
+
+
+const DeleteItemFromcart = async (id) => {
+  const query =
+    gql`
+  mutation DeleteCartItem {
+    deleteUserCart(where: {id: "` +
+    id +
+    `"}) {
+      id
+    }
+  }
+  `;
+  const result = await request(MASTER_URL, query);
+  return result;
+};
+
+
 export default {
   GetCategory,
   GetBusiness,
   GetBusinessDetail,
   AddToCart,
   GetUserCart,
+  DisconnectRestroFromUserCartItem,
+  DeleteItemFromcart 
 };

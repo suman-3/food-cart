@@ -28,7 +28,6 @@ const MenuSection = ({ restaurant }) => {
   };
 
   const addToCartHandler = (item) => {
-    toast("Adding to cart");
     const data = {
       email: user?.primaryEmailAddress?.emailAddress,
       name: item?.name,
@@ -36,7 +35,6 @@ const MenuSection = ({ restaurant }) => {
       productImage: item?.productImage?.url,
       resturantSlug: restaurant?.slug,
       price: item?.price,
-      
     };
     GlobalApi.AddToCart(data).then(
       (resp) => {
@@ -91,10 +89,12 @@ const MenuSection = ({ restaurant }) => {
                     <h2 className="text-sm text-gray-400 line-clamp-2">
                       {item?.description}
                     </h2>
-                    <SquarePlus
-                      className="mt-1 cursor-pointer"
-                      onClick={() => addToCartHandler(item)}
-                    />
+                    {user && (
+                      <SquarePlus
+                        className="mt-1 cursor-pointer"
+                        onClick={() => addToCartHandler(item)}
+                      />
+                    )}
                   </div>
                 </div>
               ))}

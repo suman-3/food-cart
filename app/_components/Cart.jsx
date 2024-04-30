@@ -1,22 +1,43 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { useContext, useEffect } from "react";
+import GlobalApi from "../_utils/GlobalApi";
+import { toast } from "sonner";
+import { CartUpdateContext } from "../_context/CartUpdateContext";
 
 const Cart = ({ cart }) => {
+  const { updateCart, setUpdateCart } = useContext(CartUpdateContext);
+
   const CalculateCartAmount = () => {
     let total = 0;
     cart.forEach((item) => {
       total = total + item.price;
     });
 
-    return total.toFixed(2)
+    return total.toFixed(2);
   };
 
+  const RemoveItemFromCart = (id) => {
+    GlobalApi.DisconnectRestroFromUserCartItem(id).then((res) => {
+      if (res) {
+        GlobalApi.DeleteItemFromcart(id).then((res) => {
+          setUpdateCart(!updateCart);
+          toast("Item removed");
+        });
+      }
+    });
+  };
   return (
     <div>
       <div className="flex flex-col gap-4">
-        <h2 className="font-bold">My Order</h2>
+        {cart.length > 0 ? (
+          <h2 className="font-bold">My Order</h2>
+        ) : (
+          <h2 className="font-bold">Cart Is Empty</h2>
+        )}
         {cart &&
           cart.map((item, index) => {
             return (
@@ -34,19 +55,26 @@ const Cart = ({ cart }) => {
                   />
                   <div className="flex flex-col gap-[1px]">
                     <h2 className="text-sm text-black">{item.productName}</h2>
-                    <h2 className="text-[12px] text-gray-800">
-                      Restaurant: {item.resturant.name}
-                    </h2>
+                    {item?.resturant?.name && (
+                      <h2 className="text-[12px] text-gray-800">
+                        Restaurant: {item?.resturant?.name}
+                      </h2>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-1 items-center">
                   <h2 className="font-bold"> ₹{item.price}</h2>
-                  <X className="h-8 w-8 text-primary cursor-pointer border p-1 rounded-lg hover:bg-slate-200" />
+                  <X
+                    onClick={() => RemoveItemFromCart(item.id)}
+                    className="h-8 w-8 text-primary cursor-pointer border p-1 rounded-lg hover:bg-slate-200"
+                  />
                 </div>
               </div>
             );
           })}
-        <Button>Checkout ₹&nbsp;{CalculateCartAmount()}</Button>
+        {cart.length > 0 && (
+          <Button>Checkout ₹&nbsp;{CalculateCartAmount()}</Button>
+        )}
       </div>
     </div>
   );
