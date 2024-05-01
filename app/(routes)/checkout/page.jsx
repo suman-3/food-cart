@@ -4,9 +4,11 @@ import GlobalApi from "@/app/_utils/GlobalApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
-import { ArrowRight } from "lucide-react";
+import { PayPalButtons } from "@paypal/react-paypal-js";
+import { ArrowRight, Loader } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const params = useSearchParams();
@@ -21,9 +23,12 @@ const Checkout = () => {
   const [zip, setZip] = useState("");
   const [address, setAddress] = useState("");
 
-  const [deliveryAmount, setDeliveryAmount] = useState(50);
+  const [deliveryAmount, setDeliveryAmount] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);
   const [total, setTotal] = useState(0);
+  const [totalInDollar, setTotalInDollar] = useState(0);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -47,15 +52,56 @@ const Checkout = () => {
     });
     setSubTotal(total.toFixed(2));
     const calculatedTax = (total * 9) / 100;
+    setDeliveryAmount(total > 0 ? 50 : 0);
     setTaxAmount(calculatedTax);
     setTotal(total + calculatedTax + deliveryAmount);
+    setUpdateCart(!updateCart);
+    setTotalInDollar((total + calculatedTax + deliveryAmount) / 75);
   };
 
   const addToOrder = () => {
-    GlobalApi.CreateNewOrder().then((res) => {
-      console.log(res);
+    setLoading(true);
+    const data = {
+      //email:user.primaryEmailAddress.emailAddress,
+      email: email,
+      orderAmount: total,
+      restaurentName: params.get("restaurent"),
+      //userName:user.fullName,
+      userName: username,
+      phone: phone,
+      address: address,
+      zipCode: zip,
+    };
+    GlobalApi.CreateNewOrder(data).then((res) => {
+      const resultId = res?.createOrder?.id;
+      const emailTodeleteCart = user?.primaryEmailAddress.emailAddress;
+      if (resultId) {
+        cart.forEach(
+          (item) => {
+            GlobalApi.UpdateOrderToAddOrderItems(
+              item.productName,
+              item.price,
+              resultId,
+              emailTodeleteCart
+            ).then(
+              (res) => {
+                setLoading(false);
+                toast("Order Created Successfully");
+                window.location.reload();
+              },
+              (error) => {
+                setLoading(false);
+              }
+            );
+          },
+          (error) => {
+            setLoading(false);
+          }
+        );
+      }
     });
   };
+
   return (
     <div>
       <h2 className="font-bold text-2xl my-4 ml-9">Checkout</h2>
@@ -105,7 +151,45 @@ const Checkout = () => {
             <h2 className="font-bold flex justify-between">
               Total:<span>₹{total.toFixed(2)}</span>
             </h2>
-            <Button onClick={() => addToOrder()}>Make Payment </Button>
+            {total > 5 && (
+              <Button
+                onClick={() => addToOrder()}
+                disabled={
+                  email == "" ||
+                  username == "" ||
+                  phone == "" ||
+                  zip == "" ||
+                  address == ""
+                }
+              >
+                {loading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  "Make Payment "
+                )}
+              </Button>
+            )}
+            {total > 5 && (
+              <PayPalButtons
+                disabled={
+                  !(username && email && address && zip && phone) || loading
+                }
+                style={{ layout: "horizontal" }}
+                onApprove={addToOrder}
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          value: totalInDollar.toFixed(2),
+                          currency_code: "USD",
+                        },
+                      },
+                    ],
+                  });
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
