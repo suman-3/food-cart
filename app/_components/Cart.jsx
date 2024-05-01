@@ -7,6 +7,7 @@ import React, { useContext, useEffect } from "react";
 import GlobalApi from "../_utils/GlobalApi";
 import { toast } from "sonner";
 import { CartUpdateContext } from "../_context/CartUpdateContext";
+import Link from "next/link";
 
 const Cart = ({ cart }) => {
   const { updateCart, setUpdateCart } = useContext(CartUpdateContext);
@@ -73,7 +74,14 @@ const Cart = ({ cart }) => {
             );
           })}
         {cart.length > 0 && (
-          <Button>Checkout ₹&nbsp;{CalculateCartAmount()}</Button>
+          <Link
+            href={"/checkout?restaurent=" + cart[0]?.resturant?.name}
+            className="w-full"
+          >
+            <Button className="w-full">
+              Checkout ₹&nbsp;{CalculateCartAmount()}
+            </Button>
+          </Link>
         )}
       </div>
     </div>
