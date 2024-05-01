@@ -87,9 +87,10 @@ const Checkout = () => {
             ).then(
               (res) => {
                 setLoading(false);
+                SendEmail();
                 toast("Order Created Successfully");
                 setUpdateCart(!updateCart);
-                SendEmail();
+
                 router.replace("/confirmation");
               },
               (error) => {

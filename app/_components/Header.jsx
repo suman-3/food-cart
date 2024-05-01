@@ -15,6 +15,15 @@ import {
 } from "@/components/ui/popover";
 import Cart from "./Cart";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
 const Header = () => {
   const { user, isSignedIn } = useUser();
   const { updateCart, setUpdateCart } = useContext(CartUpdateContext);
@@ -60,7 +69,30 @@ const Header = () => {
             </PopoverContent>
           </Popover>
 
-          <UserButton />
+          {/* <UserButton />*/}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="p-1 bg-slate-200 cursor-pointer rounded-full">
+                <Image
+                  src={user?.imageUrl}
+                  alt={user?.fullName}
+                  width={40}
+                  height={40}
+                  className="rounded-full cursor-pointer"
+                />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <Link href={"/user"}>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem>My Order</DropdownMenuItem>
+              <DropdownMenuItem>Logout</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ) : (
         <>
