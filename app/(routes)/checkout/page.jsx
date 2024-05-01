@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { ArrowRight, Loader } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -14,6 +14,7 @@ const Checkout = () => {
   const params = useSearchParams();
   const { updateCart, setUpdateCart } = useContext(CartUpdateContext);
   const [subTotal, setSubTotal] = useState(0);
+  const router = useRouter();
 
   const { user } = useUser();
   const [cart, setCart] = useState([]);
@@ -86,8 +87,11 @@ const Checkout = () => {
             ).then(
               (res) => {
                 setLoading(false);
+                SendEmail();
                 toast("Order Created Successfully");
-                window.location.reload();
+                setUpdateCart(!updateCart);
+
+                router.replace("/confirmation");
               },
               (error) => {
                 setLoading(false);
@@ -100,6 +104,25 @@ const Checkout = () => {
         );
       }
     });
+  };
+
+  const SendEmail = async () => {
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user?.primaryEmailAddress.emailAddress }),
+      });
+      if (!response.ok) {
+        toast("Error while sending email");
+      } else {
+        toast("Email sent successfully");
+      }
+    } catch (error) {
+      toast("Error while sending email");
+    }
   };
 
   return (

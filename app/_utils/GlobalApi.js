@@ -327,6 +327,36 @@ const UpdateOrderToAddOrderItems = async (name, price, id, email) => {
   return result;
 };
 
+const GetUsersOrders = async (email) => {
+  const query =
+    gql`
+    query UserOrders {
+      orders(where: { email: "` +
+    email +
+    `" }, orderBy: publishedAt_DESC) {
+        address
+        createdAt
+        email
+        id
+        orderAmount
+        orderDetail {
+          ... on OrderItem {
+            id
+            name
+            price
+          }
+        }
+        phone
+        restaurentName
+        userName
+        zipCode
+      }
+    }
+  `;
+  const result = await request(MASTER_URL, query);
+  return result;
+};
+
 export default {
   GetCategory,
   GetBusiness,
@@ -339,4 +369,5 @@ export default {
   GetRestaurentReviewes,
   CreateNewOrder,
   UpdateOrderToAddOrderItems,
+  GetUsersOrders,
 };

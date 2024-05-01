@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
+import {
+  SignInButton,
+  SignOutButton,
+  SignUpButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import { Search, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,6 +20,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import Cart from "./Cart";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const { user, isSignedIn } = useUser();
@@ -60,7 +75,34 @@ const Header = () => {
             </PopoverContent>
           </Popover>
 
-          <UserButton />
+          {/* <UserButton />*/}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <div className="p-1 bg-slate-200 cursor-pointer rounded-full">
+                <Image
+                  src={user?.imageUrl}
+                  alt={user?.fullName}
+                  width={40}
+                  height={40}
+                  className="rounded-full cursor-pointer"
+                />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <Link href={"/user"}>
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+              </Link>
+              <Link href={"/user/my-orders"}>
+                <DropdownMenuItem>My Order</DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem>
+                <SignOutButton>Logout</SignOutButton>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       ) : (
         <>
