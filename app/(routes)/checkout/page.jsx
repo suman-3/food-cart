@@ -4,7 +4,7 @@ import GlobalApi from "@/app/_utils/GlobalApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
 
@@ -24,6 +24,8 @@ const Checkout = () => {
   const [deliveryAmount, setDeliveryAmount] = useState(50);
   const [taxAmount, setTaxAmount] = useState(0);
   const [total, setTotal] = useState(0);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -52,8 +54,37 @@ const Checkout = () => {
   };
 
   const addToOrder = () => {
-    GlobalApi.CreateNewOrder().then((res) => {
-      console.log(res);
+    setLoading(true);
+    const data = {
+      //email:user.primaryEmailAddress.emailAddress,
+      email: email,
+      orderAmount: total,
+      restaurentName: params.get("restaurent"),
+      //userName:user.fullName,
+      userName: username,
+      phone: phone,
+      address: address,
+      zipCode: zip,
+    };
+    GlobalApi.CreateNewOrder(data).then((res) => {
+      const resultId = res?.createOrder?.id;
+      if (resultId) {
+        cart.forEach(
+          (item) => {
+            GlobalApi.UpdateOrderToAddOrderItems(
+              item.productName,
+              item.price,
+              resultId
+            ).then((res) => {
+              console.log(res);
+              setLoading(false);
+            });
+          },
+          (error) => {
+            setLoading(false);
+          }
+        );
+      }
     });
   };
   return (
@@ -105,7 +136,9 @@ const Checkout = () => {
             <h2 className="font-bold flex justify-between">
               Total:<span>₹{total.toFixed(2)}</span>
             </h2>
-            <Button onClick={() => addToOrder()}>Make Payment </Button>
+            <Button onClick={() => addToOrder()}>
+              {loading ? <Loader className="animate-spin" /> : "Make Payment "}
+            </Button>
           </div>
         </div>
       </div>
