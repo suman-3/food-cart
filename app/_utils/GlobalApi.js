@@ -252,6 +252,44 @@ const GetRestaurentReviewes = async (slug) => {
   return result;
 };
 
+const CreateNewOrder = async (data) => {
+  const query =
+    gql`
+    mutation CreateNeworder {
+      createOrder(
+        data: {
+          email: "` +
+    data.email +
+    `",
+          orderAmount: ` +
+    data.orderAmount +
+    `,
+          restaurentName: "` +
+    data.restaurentName +
+    `",
+          userName: "` +
+    data.userName +
+    `",
+          phone: "` +
+    data.phone +
+    `",
+          address: "` +
+    data.address +
+    `",
+          zipCode: "` +
+    data.zipCode +
+    `",
+        }
+      ) {
+        id
+      }
+    }
+  `;
+
+  const result = await request(MASTER_URL, query);
+  return result;
+};
+
 export default {
   GetCategory,
   GetBusiness,
@@ -262,4 +300,5 @@ export default {
   DeleteItemFromcart,
   AddNewReview,
   GetRestaurentReviewes,
+  CreateNewOrder,
 };
