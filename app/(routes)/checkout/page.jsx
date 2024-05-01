@@ -4,6 +4,7 @@ import GlobalApi from "@/app/_utils/GlobalApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@clerk/nextjs";
+import { PayPalButtons } from "@paypal/react-paypal-js";
 import { ArrowRight, Loader } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
@@ -25,6 +26,7 @@ const Checkout = () => {
   const [deliveryAmount, setDeliveryAmount] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);
   const [total, setTotal] = useState(0);
+  const [totalInDollar, setTotalInDollar] = useState(0);
 
   const [loading, setLoading] = useState(false);
 
@@ -50,10 +52,11 @@ const Checkout = () => {
     });
     setSubTotal(total.toFixed(2));
     const calculatedTax = (total * 9) / 100;
-    setDeliveryAmount(total>100 ? 50 : 20)
+    setDeliveryAmount(total > 0 ? 50 : 0);
     setTaxAmount(calculatedTax);
     setTotal(total + calculatedTax + deliveryAmount);
-    setUpdateCart(!updateCart)
+    setUpdateCart(!updateCart);
+    setTotalInDollar((total + calculatedTax + deliveryAmount) / 75);
   };
 
   const addToOrder = () => {
@@ -82,9 +85,9 @@ const Checkout = () => {
               emailTodeleteCart
             ).then(
               (res) => {
-                console.log(res);
                 setLoading(false);
                 toast("Order Created Successfully");
+                window.location.reload();
               },
               (error) => {
                 setLoading(false);
@@ -98,6 +101,7 @@ const Checkout = () => {
       }
     });
   };
+
   return (
     <div>
       <h2 className="font-bold text-2xl my-4 ml-9">Checkout</h2>
@@ -147,11 +151,45 @@ const Checkout = () => {
             <h2 className="font-bold flex justify-between">
               Total:<span>₹{total.toFixed(2)}</span>
             </h2>
-            <Button onClick={() => addToOrder()} 
-            disabled={email=="" || username=="" || phone=="" || zip=="" || address==""}
-            >
-              {loading ? <Loader className="animate-spin" /> : "Make Payment "}
-            </Button>
+            {total > 5 && (
+              <Button
+                onClick={() => addToOrder()}
+                disabled={
+                  email == "" ||
+                  username == "" ||
+                  phone == "" ||
+                  zip == "" ||
+                  address == ""
+                }
+              >
+                {loading ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  "Make Payment "
+                )}
+              </Button>
+            )}
+            {total > 5 && (
+              <PayPalButtons
+                disabled={
+                  !(username && email && address && zip && phone) || loading
+                }
+                style={{ layout: "horizontal" }}
+                onApprove={addToOrder}
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          value: totalInDollar.toFixed(2),
+                          currency_code: "USD",
+                        },
+                      },
+                    ],
+                  });
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
