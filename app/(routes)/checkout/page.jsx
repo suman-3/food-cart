@@ -7,6 +7,7 @@ import { useUser } from "@clerk/nextjs";
 import { ArrowRight, Loader } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import React, { useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Checkout = () => {
   const params = useSearchParams();
@@ -21,7 +22,7 @@ const Checkout = () => {
   const [zip, setZip] = useState("");
   const [address, setAddress] = useState("");
 
-  const [deliveryAmount, setDeliveryAmount] = useState(50);
+  const [deliveryAmount, setDeliveryAmount] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);
   const [total, setTotal] = useState(0);
 
@@ -49,8 +50,10 @@ const Checkout = () => {
     });
     setSubTotal(total.toFixed(2));
     const calculatedTax = (total * 9) / 100;
+    setDeliveryAmount(total>100 ? 50 : 20)
     setTaxAmount(calculatedTax);
     setTotal(total + calculatedTax + deliveryAmount);
+    setUpdateCart(!updateCart)
   };
 
   const addToOrder = () => {
@@ -68,17 +71,25 @@ const Checkout = () => {
     };
     GlobalApi.CreateNewOrder(data).then((res) => {
       const resultId = res?.createOrder?.id;
+      const emailTodeleteCart = user?.primaryEmailAddress.emailAddress;
       if (resultId) {
         cart.forEach(
           (item) => {
             GlobalApi.UpdateOrderToAddOrderItems(
               item.productName,
               item.price,
-              resultId
-            ).then((res) => {
-              console.log(res);
-              setLoading(false);
-            });
+              resultId,
+              emailTodeleteCart
+            ).then(
+              (res) => {
+                console.log(res);
+                setLoading(false);
+                toast("Order Created Successfully");
+              },
+              (error) => {
+                setLoading(false);
+              }
+            );
           },
           (error) => {
             setLoading(false);
@@ -136,7 +147,9 @@ const Checkout = () => {
             <h2 className="font-bold flex justify-between">
               Total:<span>₹{total.toFixed(2)}</span>
             </h2>
-            <Button onClick={() => addToOrder()}>
+            <Button onClick={() => addToOrder()} 
+            disabled={email=="" || username=="" || phone=="" || zip=="" || address==""}
+            >
               {loading ? <Loader className="animate-spin" /> : "Make Payment "}
             </Button>
           </div>

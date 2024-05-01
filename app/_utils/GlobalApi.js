@@ -290,7 +290,7 @@ const CreateNewOrder = async (data) => {
   return result;
 };
 
-const UpdateOrderToAddOrderItems = async (name, price, id) => {
+const UpdateOrderToAddOrderItems = async (name, price, id, email) => {
   const query =
     gql`
     mutation UpdateOrderWithDetails {
@@ -311,6 +311,16 @@ const UpdateOrderToAddOrderItems = async (name, price, id) => {
       {
         id
       }
+      publishManyOrders(to: PUBLISHED) {
+        count
+      }
+     
+        deleteManyUserCarts(where: {email: "` +
+    email +
+    `"}) {
+          count
+        }
+      
     }
   `;
   const result = await request(MASTER_URL, query);
