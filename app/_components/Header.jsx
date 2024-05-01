@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
+import {
+  SignInButton,
+  SignOutButton,
+  SignUpButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import { Search, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -89,8 +95,12 @@ const Header = () => {
               <Link href={"/user"}>
                 <DropdownMenuItem>Profile</DropdownMenuItem>
               </Link>
-              <DropdownMenuItem>My Order</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <Link href={"/user/my-orders"}>
+                <DropdownMenuItem>My Order</DropdownMenuItem>
+              </Link>
+              <DropdownMenuItem>
+                <SignOutButton>Logout</SignOutButton>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
